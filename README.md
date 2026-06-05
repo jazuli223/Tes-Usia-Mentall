@@ -1,1 +1,0 @@
-# Tes-Usia-Mentall
