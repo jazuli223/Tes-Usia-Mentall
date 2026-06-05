@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tes Usia Mental</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1208;
+    --cream: #f5f0e8;
+    --warm: #e8dcc8;
+    --gold: #c9a84c;
+    --rust: #b85c38;
+    --sage: #6b7f5e;
+    --mist: #8fa3b1;
+    --paper: #faf7f2;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    text-align: center;
+    padding: 3rem 0 2.5rem;
+    border-bottom: 1px solid var(--warm);
+    margin-bottom: 3rem;
+    animation: fadeDown 0.8s ease both;
+  }
+
+  .header-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--rust);
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 6vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 1rem;
+  }
+
+  .header h1 em {
+    font-style: italic;
+    color: var(--rust);
+  }
+
+  .header p {
+    font-size: 0.95rem;
+    color: #6b6050;
+    line-height: 1.7;
+    max-width: 420px;
+    margin: 0 auto;
+    font-weight: 300;
+  }
+
+  /* ── PROGRESS ── */
+  .progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+
+  .progress-bar {
+    flex: 1;
+    height: 3px;
+    background: var(--warm);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--rust), var(--gold));
+    border-radius: 99px;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .progress-text {
+    font-size: 0.75rem;
+    color: #8a7a6a;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  /* ── QUIZ CARD ── */
+  .quiz-screen { display: none; }
+  .quiz-screen.active { display: block; }
+
+  .question-card {
+    background: white;
+    border-radius: 2px;
+    border: 1px solid var(--warm);
+    padding: 2.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 20px rgba(26,18,8,0.06), 4px 4px 0 var(--warm);
+    animation: cardIn 0.5s cubic-bezier(0.4,0,0.2,1) both;
+  }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-number {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 500;
+    margin-bottom: 1.2rem;
+  }
+
+  .q-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.1rem, 3vw, 1.35rem);
+    line-height: 1.6;
+    color: var(--ink);
+    margin-bottom: 2rem;
+  }
+
+  .options {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .option-btn {
+    background: var(--paper);
+    border: 1.5px solid var(--warm);
+    border-radius: 2px;
+    padding: 1rem 1.25rem;
+    text-align: left;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    color: #4a3c2e;
+    font-weight: 400;
+    line-height: 1.5;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .option-btn::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--rust);
+    transform: scaleY(0);
+    transition: transform 0.2s ease;
+  }
+
+  .option-btn:hover {
+    border-color: var(--rust);
+    background: white;
+    color: var(--ink);
+    transform: translateX(4px);
+  }
+
+  .option-btn:hover::before { transform: scaleY(1); }
+
+  .option-btn.selected {
+    border-color: var(--rust);
+    background: #fdf5f0;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .option-btn.selected::before { transform: scaleY(1); }
+
+  /* ── NAVIGATION ── */
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+
+  .btn-ghost {
+    background: none;
+    border: 1.5px solid var(--warm);
+    padding: 0.75rem 1.5rem;
+    border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    color: #8a7a6a;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.2s ease;
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+
+  .btn-ghost:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .btn-primary {
+    background: var(--ink);
+    border: 1.5px solid var(--ink);
+    padding: 0.75rem 2rem;
+    border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    color: var(--cream);
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .btn-primary:hover {
+    background: var(--rust);
+    border-color: var(--rust);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  /* ── RESULT SCREEN ── */
+  #result-screen {
+    display: none;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  #result-screen.active { display: block; }
+
+  .result-card {
+    background: white;
+    border: 1px solid var(--warm);
+    border-radius: 2px;
+    padding: 3rem 2.5rem;
+    box-shadow: 0 2px 20px rgba(26,18,8,0.06), 6px 6px 0 var(--warm);
+    text-align: center;
+  }
+
+  .result-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--rust);
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+  }
+
+  .result-age-wrap {
+    margin: 1rem 0 2rem;
+    position: relative;
+    display: inline-block;
+  }
+
+  .result-age {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(5rem, 18vw, 9rem);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+    position: relative;
+  }
+
+  .result-age-unit {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-style: italic;
+    color: var(--rust);
+    display: block;
+    margin-top: -0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .result-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--ink);
+  }
+
+  .result-desc {
+    font-size: 0.95rem;
+    color: #6b6050;
+    line-height: 1.75;
+    max-width: 480px;
+    margin: 0 auto 2.5rem;
+    font-weight: 300;
+  }
+
+  .traits-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .trait-chip {
+    background: var(--paper);
+    border: 1px solid var(--warm);
+    border-radius: 2px;
+    padding: 0.6rem 0.5rem;
+    font-size: 0.78rem;
+    color: #5a4a38;
+    font-weight: 500;
+  }
+
+  .divider {
+    width: 40px;
+    height: 1px;
+    background: var(--warm);
+    margin: 2rem auto;
+  }
+
+  .btn-restart {
+    background: none;
+    border: 1.5px solid var(--ink);
+    padding: 0.85rem 2.5rem;
+    border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    color: var(--ink);
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+    transition: all 0.25s ease;
+  }
+
+  .btn-restart:hover {
+    background: var(--ink);
+    color: var(--cream);
+  }
+
+  /* ── INTRO SCREEN ── */
+  #intro-screen {
+    text-align: center;
+    padding: 2rem 0;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .intro-deco {
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    line-height: 1;
+    margin-bottom: 1rem;
+    filter: grayscale(0.3);
+  }
+
+  .intro-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin: 2.5rem 0 3rem;
+    text-align: left;
+  }
+
+  .step {
+    background: white;
+    border: 1px solid var(--warm);
+    padding: 1.25rem 1rem;
+    border-radius: 2px;
+  }
+
+  .step-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--rust);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .step p {
+    font-size: 0.8rem;
+    color: #7a6a58;
+    line-height: 1.5;
+  }
+
+  .btn-start {
+    background: var(--rust);
+    border: none;
+    padding: 1rem 3rem;
+    border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    color: white;
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+    transition: all 0.25s ease;
+    box-shadow: 4px 4px 0 #8a3020;
+  }
+
+  .btn-start:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 #8a3020;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .hidden { display: none !important; }
+
+  /* ── SCORE BAR ── */
+  .score-breakdown {
+    margin: 1.5rem 0;
+    text-align: left;
+  }
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.6rem;
+    font-size: 0.8rem;
+    color: #6b6050;
+  }
+  .score-row-label { width: 110px; flex-shrink: 0; }
+  .score-row-bar {
+    flex: 1;
+    height: 4px;
+    background: var(--warm);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .score-row-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--rust), var(--gold));
+    transition: width 1s 0.5s ease;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER (always visible) -->
+  <div class="header">
+    <div class="header-label">(Jangan lupa follow tiktok @zgatnat)</div>
+    <h1>Berapa Usia <em>Mental</em> Kamu?</h1>
+    <p>Jawab 10 pertanyaan jujur untuk menemukan kedewasaan emosional dan mental yang sesungguhnya.</p>
+  </div>
+
+  <!-- INTRO SCREEN -->
+  <div id="intro-screen">
+    <div class="intro-deco">🪞</div>
+    <div class="intro-steps">
+      <div class="step">
+        <div class="step-num">10</div>
+        <p>pertanyaan tentang cara kamu berpikir & merasa</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2'</div>
+        <p>hanya butuh sekitar 2 menit untuk selesai</p>
+      </div>
+      <div class="step">
+        <div class="step-num">∞</div>
+        <p>tidak ada jawaban benar atau salah di sini</p>
+      </div>
+    </div>
+    <button class="btn-start" onclick="startQuiz()">Mulai Tes →</button>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div id="quiz-screen" class="quiz-screen">
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="progress-text" id="progress-text">1 / 10</div>
+    </div>
+
+    <div class="question-card" id="question-card">
+      <div class="q-number" id="q-number">Pertanyaan 01</div>
+      <div class="q-text" id="q-text"></div>
+      <div class="options" id="options-container"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-ghost" id="btn-prev" onclick="prevQuestion()" disabled>← Kembali</button>
+      <button class="btn-primary" id="btn-next" onclick="nextQuestion()" disabled>Lanjut →</button>
+    </div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div id="result-screen">
+    <div class="result-card">
+      <div class="result-label">Hasil Tes Usia Mental</div>
+      <div class="result-age-wrap">
+        <div class="result-age" id="result-age">—</div>
+        <span class="result-age-unit">tahun</span>
+      </div>
+      <div class="result-title" id="result-title"></div>
+      <p class="result-desc" id="result-desc"></p>
+      <div class="traits-grid" id="traits-grid"></div>
+      <div class="divider"></div>
+      <button class="btn-restart" onclick="restartQuiz()">Ulangi Tes</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    text: "Ketika kamu menghadapi masalah besar, apa reaksi pertamamu?",
+    options: [
+      { text: "Panik dan tidak tahu harus berbuat apa", score: 1 },
+      { text: "Menyalahkan keadaan atau orang lain", score: 2 },
+      { text: "Mencari dukungan orang terdekat dulu", score: 3 },
+      { text: "Tenang, analisis situasi, lalu cari solusi", score: 4 },
+    ]
+  },
+  {
+    text: "Bagaimana caramu merespons kritik dari orang lain?",
+    options: [
+      { text: "Marah dan merasa diserang secara personal", score: 1 },
+      { text: "Defensif tapi akhirnya diam saja", score: 2 },
+      { text: "Mendengarkan, meski ada rasa tidak nyaman", score: 3 },
+      { text: "Menyaring yang membangun, mengabaikan yang tidak relevan", score: 4 },
+    ]
+  },
+  {
+    text: "Seberapa sering kamu merasa kesepian, meski dikelilingi banyak orang?",
+    options: [
+      { text: "Hampir selalu — aku tidak merasa benar-benar dipahami", score: 1 },
+      { text: "Cukup sering, tapi aku tidak tahu kenapa", score: 2 },
+      { text: "Kadang-kadang, tapi aku bisa mengatasinya", score: 3 },
+      { text: "Jarang — aku nyaman dengan diriku sendiri", score: 4 },
+    ]
+  },
+  {
+    text: "Saat berselisih paham dengan seseorang yang kamu sayangi, kamu biasanya...",
+    options: [
+      { text: "Diam membatu atau kabur dari situasi", score: 1 },
+      { text: "Ngotot sampai pihak lain mengalah", score: 2 },
+      { text: "Berusaha bicara tapi sering emosional", score: 3 },
+      { text: "Mencari titik temu dengan tenang dan empati", score: 4 },
+    ]
+  },
+  {
+    text: "Bagaimana hubunganmu dengan masa depan?",
+    options: [
+      { text: "Sangat cemas dan tidak punya rencana jelas", score: 1 },
+      { text: "Serahkan saja pada takdir, aku tidak mau dipusingkan", score: 2 },
+      { text: "Punya tujuan, tapi sering ragu dan tidak konsisten", score: 3 },
+      { text: "Punya arah jelas dan langkah konkret, fleksibel jika perlu", score: 4 },
+    ]
+  },
+  {
+    text: "Ketika kamu melakukan kesalahan besar, bagaimana kamu memandang dirimu?",
+    options: [
+      { text: "Aku memang selalu gagal, ini buktinya", score: 1 },
+      { text: "Malu sekali dan ingin menghindari semua orang", score: 2 },
+      { text: "Menyesal, tapi berusaha memperbaikinya", score: 3 },
+      { text: "Belajar dari situ dan tidak menghukum diri berlebihan", score: 4 },
+    ]
+  },
+  {
+    text: "Seberapa besar pengaruh pendapat orang lain terhadap keputusanmu?",
+    options: [
+      { text: "Sangat besar — aku hampir selalu ikut apa kata orang", score: 1 },
+      { text: "Cukup besar, aku susah menolak tekanan sosial", score: 2 },
+      { text: "Mempertimbangkan tapi tetap memutuskan sendiri", score: 3 },
+      { text: "Minimal — aku punya kompas nilai yang kuat", score: 4 },
+    ]
+  },
+  {
+    text: "Bagaimana kamu mengelola emosi negatif seperti marah atau sedih?",
+    options: [
+      { text: "Meledak atau menekannya sampai meluap sendiri", score: 1 },
+      { text: "Distraksi (scroll medsos, makan, tidur terus)", score: 2 },
+      { text: "Bicara ke orang lain atau menulis untuk memprosesnya", score: 3 },
+      { text: "Merasakan, menamai, lalu melepaskannya dengan sadar", score: 4 },
+    ]
+  },
+  {
+    text: "Ketika melihat seseorang berhasil lebih dari kamu, apa yang kamu rasakan?",
+    options: [
+      { text: "Iri dan sedikit benci, jujur saja", score: 1 },
+      { text: "Rendah diri dan mulai meragukan kemampuanku", score: 2 },
+      { text: "Terinspirasi, tapi kadang muncul rasa iri juga", score: 3 },
+      { text: "Senang dan ingin belajar dari perjalanan mereka", score: 4 },
+    ]
+  },
+  {
+    text: "Bagaimana caramu menjaga keseimbangan antara kebutuhanmu sendiri dan kebutuhan orang lain?",
+    options: [
+      { text: "Aku selalu mendahulukan diri sendiri, orang lain belakangan", score: 1 },
+      { text: "Aku selalu mengorbankan diri, sampai merasa lelah dan pahit", score: 2 },
+      { text: "Berusaha seimbang, tapi kadang salah satu jadi terlalu dominan", score: 3 },
+      { text: "Tahu kapan harus memberi dan kapan menjaga batas dengan sehat", score: 4 },
+    ]
+  }
+];
+
+const results = [
+  {
+    min: 10, max: 17,
+    age: "13–17",
+    title: "Jiwa Remaja yang Mencari Jati Diri",
+    desc: "Kamu masih dalam proses memahami dirimu sendiri. Reaksimu sering didorong oleh emosi sesaat, dan kamu mungkin sangat bergantung pada validasi orang lain. Ini bukan kekurangan — ini titik awal yang bisa bertumbuh luar biasa.",
+    traits: ["Intens & emosional", "Butuh validasi", "Impulsif", "Kreatif", "Penuh semangat", "Masih mencari"]
+  },
+  {
+    min: 18, max: 24,
+    age: "18–24",
+    title: "Dewasa Muda yang Menemukan Pijakan",
+    desc: "Kamu mulai memahami dirimu, tapi masih ada momen di mana emosi mengambil alih. Kamu punya cukup kesadaran untuk tumbuh, tapi perlu konsistensi dan keberanian untuk lebih jujur pada dirimu sendiri.",
+    traits: ["Sadar diri", "Masih rapuh", "Ambisius", "Kadang impulsif", "Belajar batas", "Adaptif"]
+  },
+  {
+    min: 25, max: 31,
+    age: "25–35",
+    title: "Mental Dewasa yang Matang",
+    desc: "Kamu memiliki kedewasaan emosional yang solid. Kamu bisa mengelola konflik, memproses emosi, dan membuat keputusan dari nilai — bukan sekadar tekanan luar. Kamu adalah orang yang orang lain andalkan.",
+    traits: ["Stabil & tenang", "Empatik", "Reflektif", "Teguh pendirian", "Bijak", "Reliabel"]
+  },
+  {
+    min: 32, max: 40,
+    age: "36–50",
+    title: "Kebijaksanaan Jiwa yang Mendalam",
+    desc: "Usia mentalmu melampaui tahun kalendermu. Kamu memiliki tingkat kesadaran diri, empati, dan kedamaian batin yang langka. Kamu tidak perlu diakui untuk merasa utuh — dan itu adalah kualitas yang sangat berharga.",
+    traits: ["Tenang sejati", "Tahu diri", "Tidak reaktif", "Penuh belas kasih", "Mandiri", "Penuh makna"]
+  }
+];
+
+let currentQ = 0;
+let answers = new Array(questions.length).fill(null);
+
+function startQuiz() {
+  document.getElementById('intro-screen').style.display = 'none';
+  document.getElementById('quiz-screen').classList.add('active');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  document.getElementById('q-number').textContent = `Pertanyaan ${String(currentQ+1).padStart(2,'0')}`;
+  document.getElementById('q-text').textContent = q.text;
+  document.getElementById('progress-text').textContent = `${currentQ + 1} / ${questions.length}`;
+  document.getElementById('progress-fill').style.width = `${((currentQ) / questions.length) * 100}%`;
+
+  const container = document.getElementById('options-container');
+  container.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn' + (answers[currentQ] === i ? ' selected' : '');
+    btn.textContent = opt.text;
+    btn.onclick = () => selectOption(i);
+    container.appendChild(btn);
+  });
+
+  document.getElementById('btn-prev').disabled = currentQ === 0;
+  document.getElementById('btn-next').disabled = answers[currentQ] === null;
+  document.getElementById('btn-next').textContent = currentQ === questions.length - 1 ? 'Lihat Hasil ✦' : 'Lanjut →';
+
+  // Re-trigger animation
+  const card = document.getElementById('question-card');
+  card.style.animation = 'none';
+  card.offsetHeight;
+  card.style.animation = '';
+}
+
+function selectOption(index) {
+  answers[currentQ] = index;
+  document.querySelectorAll('.option-btn').forEach((btn, i) => {
+    btn.classList.toggle('selected', i === index);
+  });
+  document.getElementById('btn-next').disabled = false;
+}
+
+function nextQuestion() {
+  if (answers[currentQ] === null) return;
+  if (currentQ < questions.length - 1) {
+    currentQ++;
+    renderQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function prevQuestion() {
+  if (currentQ > 0) {
+    currentQ--;
+    renderQuestion();
+  }
+}
+
+function showResult() {
+  const total = answers.reduce((sum, ans, i) => sum + (ans !== null ? questions[i].options[ans].score : 0), 0);
+  const result = results.find(r => total >= r.min && total <= r.max);
+
+  document.getElementById('quiz-screen').classList.remove('active');
+  document.getElementById('quiz-screen').style.display = 'none';
+  const rs = document.getElementById('result-screen');
+  rs.style.display = 'block';
+  rs.classList.add('active');
+
+  // Animate age counter
+  const ageEl = document.getElementById('result-age');
+  const targetStr = result.age;
+  ageEl.textContent = targetStr;
+
+  document.getElementById('result-title').textContent = result.title;
+  document.getElementById('result-desc').textContent = result.desc;
+
+  const traitsGrid = document.getElementById('traits-grid');
+  traitsGrid.innerHTML = result.traits.map(t => `<div class="trait-chip">${t}</div>`).join('');
+
+  // Animate progress fill to 100%
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('progress-text').textContent = '10 / 10';
+}
+
+function restartQuiz() {
+  currentQ = 0;
+  answers = new Array(questions.length).fill(null);
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('result-screen').classList.remove('active');
+  document.getElementById('quiz-screen').style.display = '';
+  document.getElementById('quiz-screen').classList.add('active');
+  document.getElementById('progress-fill').style.width = '0%';
+  renderQuestion();
+}
+</script>
+</body>
+</html>
